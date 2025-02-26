@@ -16,7 +16,7 @@
     <!-- 通用模块库 -->
     <!-- ECommons 是一个多功能库，设计用于在 Dalamud 插件中工作。它具有各种不同的系统和快捷方式，从而消除了通常用于执行标准插件任务的大量样板代码。 -->
     <ItemGroup>
-        <ProjectReference Include="D:\Code\Dalamud\MyDalamudPlugins\ECommons\ECommons\ECommons.csproj" />
+        <ProjectReference Include="D:\Code\Dalamud\ECommons\ECommons\ECommons.csproj" />
     </ItemGroup>
 
     <!-- 卫月依赖库路径 -->
