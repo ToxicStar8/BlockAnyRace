@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/de1cdf6f-6497-4720-85c8-0a863fdc944d)![image](https://github.com/user-attachments/assets/5fea125c-fc43-4edc-be4b-377af0c9d03b)# BlockAnyRace
+# BlockAnyRace
 屏蔽掉任何你不想看到的种族和玩家，除了你队友和好友！
 
 ##### TODO
