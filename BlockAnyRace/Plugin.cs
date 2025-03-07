@@ -34,6 +34,7 @@ using FFXIVClientStructs.FFXIV.Client.Graphics.Kernel;
 using System.Formats.Tar;
 using System.Text;
 using Lumina.Excel.Sheets;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 
 namespace Main
 {
@@ -63,6 +64,9 @@ namespace Main
             _blackHashSet ??= new HashSet<ulong>();
             InfoProxyBlackListUpdateHook ??= Svc.Hook.HookFromSignature<InfoProxyBlackListUpdateDelegate>(InfoProxyBlackListUpdateSig, InfoProxyBlackListUpdateDetour);
             InfoProxyBlackListUpdateHook.Enable();
+            //测试创建角色模型Hook
+            CreateCharacterHook ??= Svc.Hook.HookFromSignature<CreateCharacterDelegate>(CreateCharacterSig, CreateCharacterDetour);
+            CreateCharacterHook.Enable();
 
             //绑定指令监听
             Svc.Commands.AddHandler(_commonName, new CommandInfo(OpenMainUI)
@@ -133,6 +137,12 @@ namespace Main
             _blackHashSet = tempHashSet;
         }
         #endregion
+
+        private CharacterBase* CreateCharacterDetour(uint modelId, CustomizeData* customize, EquipmentModelId* equipData, byte unk)
+        {
+            Svc.Log.Debug($"执行创建模型 种族={customize->Race} 性别={customize->Sex}");
+            return CreateCharacterHook.Original(modelId, customize, equipData, unk);
+        }
 
         #region Core
         private void Update(IFramework framework)
@@ -386,6 +396,9 @@ namespace Main
             //移除黑名单Hook
             InfoProxyBlackListUpdateHook?.Disable();
             InfoProxyBlackListUpdateHook = null;
+            //移除创建角色Hook
+            CreateCharacterHook?.Disable();
+            CreateCharacterHook = null;
             //移除Update监听
             Svc.Framework.Update -= Update;
             //
