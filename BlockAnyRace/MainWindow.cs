@@ -42,13 +42,13 @@ namespace Main
         {
             ImGui.BeginTabBar(Plugin.Instance.Name);
 
-            if (ImGui.BeginTabItem("选择你想屏蔽的种族"))
+            if (ImGui.BeginTabItem(Lang.SelectBlockRaceTitle))
             {
-                ImGui.BeginTable("raceTable", 3, ImGuiTableFlags.NoBordersInBody | ImGuiTableFlags.SizingFixedSame);
+                ImGui.BeginTable("bar-raceTable", 3, ImGuiTableFlags.NoBordersInBody | ImGuiTableFlags.SizingFixedSame);
 
-                ImGui.TableSetupColumn("种族");
-                ImGui.TableSetupColumn("男");
-                ImGui.TableSetupColumn("女");
+                ImGui.TableSetupColumn(Lang.Race);
+                ImGui.TableSetupColumn(Lang.Sex[0]);
+                ImGui.TableSetupColumn(Lang.Sex[1]);
                 ImGui.TableHeadersRow();
 
                 foreach (var item in Plugin.Instance.Configuration.ByteToRace)
@@ -93,12 +93,12 @@ namespace Main
                 ImGui.EndTabItem();
             }
 
-            if (ImGui.BeginTabItem("指定的屏蔽名单"))
+            if (ImGui.BeginTabItem(Lang.TargetBlockList))
             {
-                ImGui.BeginTable("targetRoleTable", 3, ImGuiTableFlags.NoBordersInBody | ImGuiTableFlags.SizingFixedSame);
+                ImGui.BeginTable("bar-targetRoleTable", 3, ImGuiTableFlags.NoBordersInBody | ImGuiTableFlags.SizingFixedSame);
 
-                ImGui.TableSetupColumn("角色名");
-                ImGui.TableSetupColumn("服务器");
+                ImGui.TableSetupColumn(Lang.RoleName);
+                ImGui.TableSetupColumn(Lang.WorldServer);
                 ImGui.TableSetupColumn("");
                 ImGui.TableHeadersRow();
 
@@ -117,7 +117,7 @@ namespace Main
                     ImGui.Text(item.Value.HomeWorld);
 
                     ImGui.TableSetColumnIndex(2);
-                    if (ImGui.Button("移除"))
+                    if (ImGui.Button(Lang.Remove))
                     {
                         removeKey = item.Key;
                     }
@@ -133,10 +133,10 @@ namespace Main
                 ImGui.EndTabItem();
             }
 
-            if (ImGui.BeginTabItem("设置"))
+            if (ImGui.BeginTabItem(Lang.Setting))
             {
                 var checkRange = Plugin.Instance.Configuration.CheckRange;
-                if (ImGui.InputInt("附近屏蔽人数检测范围(m)", ref checkRange))
+                if (ImGui.InputInt(Lang.CheckBlockRange, ref checkRange))
                 {
                     Plugin.Instance.Configuration.CheckRange = Math.Max(1, checkRange);
                     if (ImGui.IsItemDeactivatedAfterEdit())
@@ -146,7 +146,7 @@ namespace Main
                 }
 
                 bool isLoginedOpenWindow = Plugin.Instance.Configuration.IsLoginedOpenWindow;
-                ImGui.Checkbox("登录就显示窗口", ref isLoginedOpenWindow);
+                ImGui.Checkbox(Lang.LoginShow, ref isLoginedOpenWindow);
                 if (Plugin.Instance.Configuration.IsLoginedOpenWindow != isLoginedOpenWindow)
                 {
                     Plugin.Instance.Configuration.IsLoginedOpenWindow = isLoginedOpenWindow;
@@ -155,7 +155,7 @@ namespace Main
 
                 //禁用esc关闭，仅可使用x关闭
                 bool isEscCloseWindow = Plugin.Instance.Configuration.IsEscCloseWindow;
-                ImGui.Checkbox("Esc关闭窗口", ref isEscCloseWindow);
+                ImGui.Checkbox(Lang.EscClose, ref isEscCloseWindow);
                 if (Plugin.Instance.Configuration.IsEscCloseWindow != isEscCloseWindow)
                 {
                     Plugin.Instance.Configuration.IsEscCloseWindow = isEscCloseWindow;
@@ -164,7 +164,7 @@ namespace Main
                 }
 
                 bool isRightClickAddShortcut = Plugin.Instance.Configuration.IsRightClickAddShortcut;
-                ImGui.Checkbox("右键添加快捷屏蔽", ref isRightClickAddShortcut);
+                ImGui.Checkbox(Lang.RightAddBlock, ref isRightClickAddShortcut);
                 if (Plugin.Instance.Configuration.IsRightClickAddShortcut != isRightClickAddShortcut)
                 {
                     Plugin.Instance.Configuration.IsRightClickAddShortcut = isRightClickAddShortcut;
@@ -176,9 +176,9 @@ namespace Main
                 ImGui.EndTabItem();
             } 
 
-            if (ImGui.BeginTabItem("关于"))
+            if (ImGui.BeginTabItem(Lang.About))
             {
-                if (ImGui.Button("反馈问题"))
+                if (ImGui.Button(Lang.SendIssue))
                 {
                     var url = "https://discord.gg/GWMEY9P9BX";
                     Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });

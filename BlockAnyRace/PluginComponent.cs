@@ -49,11 +49,6 @@ namespace Main
         private delegate void InfoProxyBlackListUpdateDelegate(InfoProxyBlacklist.BlockResult* outBlockResult, ulong accountId, ulong contentId);
         private Hook<InfoProxyBlackListUpdateDelegate>? InfoProxyBlackListUpdateHook;
 
-        //创建模型
-        private readonly string CreateCharacterSig = "E8 ?? ?? ?? ?? 48 8B 4F 08 48 8B D0 4C 8B 01";
-        private delegate CharacterBase* CreateCharacterDelegate(uint modelId, CustomizeData* customize, EquipmentModelId* equipData, byte unk);
-        private Hook<CreateCharacterDelegate>? CreateCharacterHook;
-
         //服务器列表
         private Dictionary<uint, World> _worlds;
         /// <summary>
@@ -84,6 +79,5 @@ namespace Main
 
         //Update限制
         private DateTime _lastUpdateTime;
-        private readonly int CheckSecond = 1;
     }
 }

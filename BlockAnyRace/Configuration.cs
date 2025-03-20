@@ -24,8 +24,19 @@ namespace Main
         //检测范围
         public int CheckRange { get; set; } = 2;
 
+        //检查时间（毫秒）
+        public float CheckMillisecond = 200;
+
         //屏蔽的种族性别
-        public Dictionary<byte, RaceInfo> ByteToRace { get; set; } = new() {
+        public Dictionary<byte, RaceInfo> ByteToRace { get; private set; }
+
+        //屏蔽的指定玩家 Key=CID Value=PlayerInfo
+        public Dictionary<ulong, PlayerInfo> BlockTargetRoleDic { get; set; }
+
+        public void Init()
+        {
+            BlockTargetRoleDic ??= new();
+            ByteToRace ??= new() {
             { 0, new RaceInfo(false,false) },
             { 1, new RaceInfo(false,false) },
             { 2, new RaceInfo(false,false) },
@@ -34,17 +45,7 @@ namespace Main
             { 5, new RaceInfo(false,false) },
             { 6, new RaceInfo(false,false) },
             { 7, new RaceInfo(false,false) },
-            { 8, new RaceInfo(false,false) },
-        };
-
-        //屏蔽的指定玩家 Key=CID Value=PlayerInfo
-        public Dictionary<ulong, PlayerInfo> BlockTargetRoleDic { get; set; } = new();
-
-
-
-        public void Init()
-        {
-
+            { 8, new RaceInfo(false,false) }};
         }
 
         public void Save()

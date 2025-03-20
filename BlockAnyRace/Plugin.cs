@@ -64,14 +64,11 @@ namespace Main
             _blackHashSet ??= new HashSet<ulong>();
             InfoProxyBlackListUpdateHook ??= Svc.Hook.HookFromSignature<InfoProxyBlackListUpdateDelegate>(InfoProxyBlackListUpdateSig, InfoProxyBlackListUpdateDetour);
             InfoProxyBlackListUpdateHook.Enable();
-            //测试创建角色模型Hook
-            CreateCharacterHook ??= Svc.Hook.HookFromSignature<CreateCharacterDelegate>(CreateCharacterSig, CreateCharacterDetour);
-            CreateCharacterHook.Enable();
 
             //绑定指令监听
             Svc.Commands.AddHandler(_commonName, new CommandInfo(OpenMainUI)
             {
-                HelpMessage = "打开设置窗口"
+                HelpMessage = Lang.OpenSetting
             });
 
             //绘制UI
@@ -84,15 +81,17 @@ namespace Main
 
             _mainWindow.RespectCloseHotkey = Configuration.IsEscCloseWindow;
 
-            IEnumerable<(ushort, string)>? valueTuples = Svc.Data.GameData.Excel.GetSheet<TerritoryType>()?.Where(
+            var tbTerritoryType = Svc.Data.GameData.Excel.GetSheet<TerritoryType>();
+            var valueTuples = tbTerritoryType?.Where(
                     //TerritoryIntendedUse=区域预期用途
-                    x => (x.TerritoryIntendedUse.Value.RowId is 0 or 1 or 13 or 19 or 21 or 23 or 44 or 46 or 47 ||
-                          TerritoryTypeWhitelist.Contains((ushort)x.RowId)) &&
-                          !string.IsNullOrEmpty(x.Name.ToString()) && x.RowId != 136).Select(x => ((ushort)x.RowId, x.PlaceName.Value.Name.ToString() ?? "Unknown Place"));
+                    x => x.TerritoryIntendedUse.Value.RowId is 0 or 1 or 13 or 19 or 21 or 23 or 44 or 46 or 47 &&
+                          !string.IsNullOrEmpty(x.Name.ToString()) && 
+                          x.RowId is not 136).Select(
+                x => ((ushort)x.RowId, x.PlaceName.Value.Name.ToString() ?? "Unknown Place"));
 
-            if (valueTuples != null)
+            if (valueTuples is not null)
             {
-                foreach ((ushort rowId, string? placeName) in valueTuples)
+                foreach ((ushort rowId, string placeName) in valueTuples)
                 {
                     TerritoryTypeWhitelist.Add(rowId);
                     Svc.Log.Debug("已添加屏蔽的区域=" + placeName);
@@ -138,16 +137,10 @@ namespace Main
         }
         #endregion
 
-        private CharacterBase* CreateCharacterDetour(uint modelId, CustomizeData* customize, EquipmentModelId* equipData, byte unk)
-        {
-            Svc.Log.Debug($"执行创建模型 种族={customize->Race} 性别={customize->Sex}");
-            return CreateCharacterHook.Original(modelId, customize, equipData, unk);
-        }
-
         #region Core
         private void Update(IFramework framework)
         {
-            if ((DateTime.Now - _lastUpdateTime).TotalMilliseconds < (CheckSecond * 1000)) return;
+            if ((DateTime.Now - _lastUpdateTime).TotalMilliseconds < Configuration.CheckMillisecond) return;
             if (!TerritoryTypeWhitelist.Contains(Svc.ClientState.TerritoryType)) return;
             if (_dtrEntry is null) return;
             if (Svc.ClientState.LocalPlayer is not { } localPlayer) return;
@@ -171,15 +164,14 @@ namespace Main
                         continue;
                     }
 
-                    //转不出服务器
-                    if (!Worlds.TryGetValue(chara->HomeWorld,out var world))
+                    //是自己
+                    if (chara->ContentId == Svc.ClientState.LocalContentId)
                     {
                         continue;
                     }
 
-                   
-                    //是自己
-                    if (chara->ContentId == Svc.ClientState.LocalContentId)
+                    //转不出服务器
+                    if (!Worlds.TryGetValue(chara->HomeWorld,out var world))
                     {
                         continue;
                     }
@@ -236,7 +228,10 @@ namespace Main
                             //如果是指定玩家，屏蔽
                             if (isTarget)
                             {
-                                chara->RenderFlags |= invisible;
+                                if ((chara->RenderFlags & invisible) is 0)
+                                {
+                                    chara->RenderFlags |= invisible;
+                                }
                             }
                             //不进行根号计算，消耗大
                             if (Vector3.DistanceSquared(myPos, needDeletePos) <= checkRange)
@@ -248,8 +243,8 @@ namespace Main
                             continue;
                         }
                         
-                        //非屏蔽玩家且被屏蔽，改为默认值
-                        if ((chara->RenderFlags & invisible) != 0)
+                        //非屏蔽玩家且被屏蔽（隐身？），改为默认值
+                        if ((chara->RenderFlags & invisible) is not 0)
                         {
                             chara->RenderFlags = 0;
                         }
@@ -257,7 +252,7 @@ namespace Main
                 }
             }
 
-            _dtrEntry.Text = $"已屏蔽: {blockNum.ToString()}";
+            _dtrEntry.Text = string.Format(Lang.BlockNum, blockNum.ToString());
             _dtrEntry.Tooltip = sb.ToString().Trim();
 
             _lastUpdateTime = DateTime.Now;
@@ -308,7 +303,7 @@ namespace Main
                 {
                     PrefixChar = 'B',
                     PrefixColor = 1,
-                    Name = "从屏蔽模型名单移除",
+                    Name = Lang.RemoveBlockList,
                     OnClicked = RemoveRoleToBlockDic
                 });
             }
@@ -318,7 +313,7 @@ namespace Main
                 {
                     PrefixChar = 'B',
                     PrefixColor = 1,
-                    Name = "添加到屏蔽模型名单",
+                    Name = Lang.AddBlockList,
                     OnClicked = AddRoleToBlockDic
                 });
             }
@@ -345,7 +340,7 @@ namespace Main
                 case "CrossWorldLinkshell":
                 case "ContentMemberList": // Eureka/Bozja/...
                 case "BeginnerChatList":
-                    return menuTargetDefault.TargetName != null && menuTargetDefault.TargetHomeWorld.Value.RowId != 0 && menuTargetDefault.TargetHomeWorld.Value.RowId != 65535;
+                    return menuTargetDefault.TargetName is  not null && menuTargetDefault.TargetHomeWorld.Value.RowId is not 0 && menuTargetDefault.TargetHomeWorld.Value.RowId is not 65535;
                 case "BlackList":
                     return menuTargetDefault.TargetName != string.Empty;
 
@@ -371,6 +366,11 @@ namespace Main
                 return;
             }
             var cid = menuTargetDefault.TargetContentId;
+            if (cid is 0)
+            {
+                Svc.Log.Error("需要添加屏蔽的人员CID为0");
+                return;
+            }
             Configuration.BlockTargetRoleDic[cid] = new PlayerInfo(cid, menuTargetDefault.TargetName, menuTargetDefault.TargetHomeWorld.Value.Name.ToString());
         }
         #endregion
@@ -396,9 +396,6 @@ namespace Main
             //移除黑名单Hook
             InfoProxyBlackListUpdateHook?.Disable();
             InfoProxyBlackListUpdateHook = null;
-            //移除创建角色Hook
-            CreateCharacterHook?.Disable();
-            CreateCharacterHook = null;
             //移除Update监听
             Svc.Framework.Update -= Update;
             //
