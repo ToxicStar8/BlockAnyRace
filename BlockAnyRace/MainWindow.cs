@@ -53,7 +53,7 @@ namespace Main
 
                 foreach (var item in Plugin.Instance.Configuration.ByteToRace)
                 {
-                    if (item.Key == 0)
+                    if (item.Key is 0)
                     {
                         continue;
                     }
@@ -123,7 +123,7 @@ namespace Main
                     }
                     ImGui.PopID();
                 }
-                if (removeKey != 0)
+                if (removeKey is not  0)
                 {
                     Plugin.Instance.Configuration.BlockTargetRoleDic.Remove(removeKey);
                     Plugin.Instance.Configuration.Save();
