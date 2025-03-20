@@ -145,6 +145,16 @@ namespace Main
                     }
                 }
 
+                var checkMillisecond = Plugin.Instance.Configuration.CheckMillisecond;
+                if (ImGui.InputInt(Lang.CheckIntervalMillisecond, ref checkMillisecond))
+                {
+                    Plugin.Instance.Configuration.CheckMillisecond = Math.Max(1, checkMillisecond);
+                    if (ImGui.IsItemDeactivatedAfterEdit())
+                    {
+                        Plugin.Instance.Configuration.Save();
+                    }
+                }
+
                 bool isLoginedOpenWindow = Plugin.Instance.Configuration.IsLoginedOpenWindow;
                 ImGui.Checkbox(Lang.LoginShow, ref isLoginedOpenWindow);
                 if (Plugin.Instance.Configuration.IsLoginedOpenWindow != isLoginedOpenWindow)

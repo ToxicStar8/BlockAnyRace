@@ -25,13 +25,13 @@ namespace Main
         public int CheckRange { get; set; } = 2;
 
         //检查时间（毫秒）
-        public float CheckMillisecond = 200;
+        public int CheckMillisecond { get; set; } = 200;
 
         //屏蔽的种族性别
         public Dictionary<byte, RaceInfo> ByteToRace { get; private set; }
 
         //屏蔽的指定玩家 Key=CID Value=PlayerInfo
-        public Dictionary<ulong, PlayerInfo> BlockTargetRoleDic { get; set; }
+        public Dictionary<ulong, PlayerInfo> BlockTargetRoleDic { get; private set; }
 
         public void Init()
         {
