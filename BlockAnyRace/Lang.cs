@@ -16,6 +16,9 @@ namespace Main
         public static readonly string CheckBlockRange = "附近屏蔽人数检测范围(m)";
         public static readonly string CheckIntervalMillisecond = "屏蔽检测间隔(ms)";
         public static readonly string EchoTipsTitle = "默语通知文本格式";
+        public static readonly string IsShowEchoTips = "是否启用默语提示";
+        public static readonly string IsBlockFriend = "是否屏蔽好友";
+        public static readonly string IsBlockParty = "是否屏蔽队友";
         public static readonly string LoginShow = "登录就显示窗口";
         public static readonly string EscClose = "Esc关闭窗口";
         public static readonly string RightAddBlock = "右键添加快捷屏蔽";

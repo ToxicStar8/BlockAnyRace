@@ -160,14 +160,42 @@ namespace Main
                 }
 
                 //默语提示
-                var echoTips = Plugin.Instance.Configuration.EchoTips;
-                if (ImGui.InputText(Lang.EchoTipsTitle, ref echoTips, 20))
+                bool isShowTipsInChat = Plugin.Instance.Configuration.IsShowTipsInChat;
+                ImGui.Checkbox(Lang.IsShowEchoTips, ref isShowTipsInChat);
+                if (Plugin.Instance.Configuration.IsShowTipsInChat != isShowTipsInChat)
                 {
-                    Plugin.Instance.Configuration.EchoTips = echoTips;
-                    if (ImGui.IsItemDeactivatedAfterEdit())
+                    Plugin.Instance.Configuration.IsShowTipsInChat = isShowTipsInChat;
+                    Plugin.Instance.Configuration.Save();
+                }
+                if (Plugin.Instance.Configuration.IsShowTipsInChat)
+                {
+                    var echoTips = Plugin.Instance.Configuration.EchoTips;
+                    if (ImGui.InputText(Lang.EchoTipsTitle, ref echoTips, 20))
                     {
-                        Plugin.Instance.Configuration.Save();
+                        Plugin.Instance.Configuration.EchoTips = echoTips;
+                        if (ImGui.IsItemDeactivatedAfterEdit())
+                        {
+                            Plugin.Instance.Configuration.Save();
+                        }
                     }
+                }
+
+                //是否屏蔽好友
+                bool isBlockFriend = Plugin.Instance.Configuration.IsBlockFriend;
+                ImGui.Checkbox(Lang.IsBlockFriend, ref isBlockFriend);
+                if (Plugin.Instance.Configuration.IsBlockFriend != isBlockFriend)
+                {
+                    Plugin.Instance.Configuration.IsBlockFriend = isBlockFriend;
+                    Plugin.Instance.Configuration.Save();
+                }
+
+                //是否屏蔽队友
+                bool isBlockParty = Plugin.Instance.Configuration.IsBlockParty;
+                ImGui.Checkbox(Lang.IsBlockParty, ref isBlockParty);
+                if (Plugin.Instance.Configuration.IsBlockParty != isBlockParty)
+                {
+                    Plugin.Instance.Configuration.IsBlockParty = isBlockParty;
+                    Plugin.Instance.Configuration.Save();
                 }
 
                 //是否登录就显示本窗口

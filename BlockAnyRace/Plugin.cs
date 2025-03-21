@@ -178,13 +178,13 @@ namespace Main
                     }
 
                     //好友
-                    if (chara->IsFriend)
+                    if (!Configuration.IsBlockFriend && chara->IsFriend)
                     {
                         continue;
                     }
 
                     //小队里
-                    if (chara->IsPartyMember)
+                    if (!Configuration.IsBlockParty && chara->IsPartyMember)
                     {
                         continue;
                     }
