@@ -36,7 +36,9 @@ namespace Main
         public bool IsRightClickAddShortcut { get; set; } = true;
 
         //屏蔽的种族性别
-        public Dictionary<byte, RaceInfo> ByteToRace { get; private set; }
+        public Dictionary<byte, RaceInfo> ByteToRace { get; set; }
+        //保存的预设
+        public Dictionary<byte, RaceInfo> TempByteToRace { get; set; }
         //屏蔽的指定玩家 Key=CID Value=PlayerInfo
         public Dictionary<ulong, PlayerInfo> BlockTargetRoleDic { get; private set; }
 

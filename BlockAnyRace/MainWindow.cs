@@ -39,6 +39,8 @@ namespace Main
 
         public override void Draw()
         {
+            var config = Plugin.Instance.Configuration;
+
             ImGui.BeginTabBar(Plugin.Instance.Name);
 
             //选择种族性别
@@ -51,7 +53,7 @@ namespace Main
                 ImGui.TableSetupColumn(Lang.Sex[1]);
                 ImGui.TableHeadersRow();
 
-                foreach (var item in Plugin.Instance.Configuration.ByteToRace)
+                foreach (var item in config.ByteToRace)
                 {
                     if (item.Key is 0)
                     {
@@ -71,7 +73,7 @@ namespace Main
                     if (item.Value.IsHideMale != isHideMale)
                     {
                         item.Value.IsHideMale = isHideMale;
-                        Plugin.Instance.Configuration.Save();
+                        config.Save();
                     }
                     ImGui.PopID();
 
@@ -82,11 +84,58 @@ namespace Main
                     if (item.Value.IsHideFemale != isHideFemale)
                     {
                         item.Value.IsHideFemale = isHideFemale;
-                        Plugin.Instance.Configuration.Save();
+                        config.Save();
                     }
 
                     ImGui.PopID();
 
+                }
+
+                ImGui.TableNextRow();
+                ImGui.TableSetColumnIndex(0);
+                ImGui.Text("");
+                //全选
+                ImGui.TableSetColumnIndex(1);
+                if (ImGui.Button(Lang.AllSelect))
+                {
+                    foreach (var item in config.ByteToRace)
+                    {
+                        item.Value.IsHideFemale = true;
+                        item.Value.IsHideMale = true;
+                    }
+                    config.Save();
+                }
+                //反选
+                ImGui.TableSetColumnIndex(2);
+                if (ImGui.Button(Lang.Reverse))
+                {
+                    foreach (var item in config.ByteToRace)
+                    {
+                        item.Value.IsHideFemale = !item.Value.IsHideFemale;
+                        item.Value.IsHideMale = !item.Value.IsHideMale;
+                    }
+                    config.Save();
+                }
+
+                ImGui.TableNextRow();
+                ImGui.TableSetColumnIndex(0);
+                ImGui.Text("");
+                //保存预设
+                ImGui.TableSetColumnIndex(1);
+                if (ImGui.Button(Lang.SavePresets))
+                {
+                    config.TempByteToRace = config.ByteToRace;
+                    config.Save();
+                }
+                //读取预设
+                ImGui.TableSetColumnIndex(2);
+                if (ImGui.Button(Lang.ReadPresets))
+                {
+                    if (config.TempByteToRace is null || config.TempByteToRace.Count is 0)
+                        return;
+
+                    config.ByteToRace = config.TempByteToRace;
+                    config.Save();
                 }
                 ImGui.EndTable();
 
