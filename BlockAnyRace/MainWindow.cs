@@ -19,7 +19,6 @@ using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using ImGuiNET;
 using ImGuiScene;
-using Microsoft.VisualBasic.Logging;
 using Dalamud.Interface.Utility.Table;
 using System.Data.Common;
 using System.Diagnostics;
@@ -42,6 +41,7 @@ namespace Main
         {
             ImGui.BeginTabBar(Plugin.Instance.Name);
 
+            //选择种族性别
             if (ImGui.BeginTabItem(Lang.SelectBlockRaceTitle))
             {
                 ImGui.BeginTable("bar-raceTable", 3, ImGuiTableFlags.NoBordersInBody | ImGuiTableFlags.SizingFixedSame);
@@ -93,6 +93,7 @@ namespace Main
                 ImGui.EndTabItem();
             }
 
+            //列表
             if (ImGui.BeginTabItem(Lang.TargetBlockList))
             {
                 ImGui.BeginTable("bar-targetRoleTable", 3, ImGuiTableFlags.NoBordersInBody | ImGuiTableFlags.SizingFixedSame);
@@ -133,8 +134,10 @@ namespace Main
                 ImGui.EndTabItem();
             }
 
+            //设置
             if (ImGui.BeginTabItem(Lang.Setting))
             {
+                //检查范围
                 var checkRange = Plugin.Instance.Configuration.CheckRange;
                 if (ImGui.InputInt(Lang.CheckBlockRange, ref checkRange))
                 {
@@ -145,6 +148,7 @@ namespace Main
                     }
                 }
 
+                //检查间隔
                 var checkMillisecond = Plugin.Instance.Configuration.CheckMillisecond;
                 if (ImGui.InputInt(Lang.CheckIntervalMillisecond, ref checkMillisecond))
                 {
@@ -155,6 +159,18 @@ namespace Main
                     }
                 }
 
+                //默语提示
+                var echoTips = Plugin.Instance.Configuration.EchoTips;
+                if (ImGui.InputText(Lang.EchoTipsTitle, ref echoTips, 20))
+                {
+                    Plugin.Instance.Configuration.EchoTips = echoTips;
+                    if (ImGui.IsItemDeactivatedAfterEdit())
+                    {
+                        Plugin.Instance.Configuration.Save();
+                    }
+                }
+
+                //是否登录就显示本窗口
                 bool isLoginedOpenWindow = Plugin.Instance.Configuration.IsLoginedOpenWindow;
                 ImGui.Checkbox(Lang.LoginShow, ref isLoginedOpenWindow);
                 if (Plugin.Instance.Configuration.IsLoginedOpenWindow != isLoginedOpenWindow)
@@ -173,6 +189,7 @@ namespace Main
                     Plugin.Instance.Configuration.Save();
                 }
 
+                //是否快捷右键添加屏蔽玩家
                 bool isRightClickAddShortcut = Plugin.Instance.Configuration.IsRightClickAddShortcut;
                 ImGui.Checkbox(Lang.RightAddBlock, ref isRightClickAddShortcut);
                 if (Plugin.Instance.Configuration.IsRightClickAddShortcut != isRightClickAddShortcut)
@@ -181,13 +198,13 @@ namespace Main
                     Plugin.Instance.Configuration.Save();
                 }
 
-                //todo:每次遇到的时候刷新一下玩家名？
-
                 ImGui.EndTabItem();
             } 
 
+            //关于
             if (ImGui.BeginTabItem(Lang.About))
             {
+                //反馈问题
                 if (ImGui.Button(Lang.SendIssue))
                 {
                     var url = "https://discord.gg/GWMEY9P9BX";

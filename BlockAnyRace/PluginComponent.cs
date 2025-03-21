@@ -79,5 +79,8 @@ namespace Main
 
         //Update限制
         private DateTime _lastUpdateTime;
+
+        //最后检测到的屏蔽玩家人数
+        private int _lastBlockNum;
     }
 }

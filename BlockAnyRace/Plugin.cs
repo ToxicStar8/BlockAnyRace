@@ -60,6 +60,7 @@ namespace Main
             //信息栏
             _dtrEntry ??= Svc.DtrBar.Get(Name);
             _dtrEntry.Shown = true;
+            _dtrEntry.OnClick += OnClick_Dtr;
             //黑名单
             _blackHashSet ??= new HashSet<ulong>();
             InfoProxyBlackListUpdateHook ??= Svc.Hook.HookFromSignature<InfoProxyBlackListUpdateDelegate>(InfoProxyBlackListUpdateSig, InfoProxyBlackListUpdateDetour);
@@ -236,7 +237,7 @@ namespace Main
                             //不进行根号计算，消耗大
                             if (Vector3.DistanceSquared(myPos, needDeletePos) <= checkRange)
                             {
-                                var str = isTarget ? "指定玩家" : "黑名单";
+                                var str = isTarget ? Lang.TargetRole : Lang.BlackList;
                                 sb.AppendLine($"{obj.Name} @{world.Name} @{str}");
                                 blockNum++;
                             }
@@ -255,11 +256,25 @@ namespace Main
             _dtrEntry.Text = string.Format(Lang.BlockNum, blockNum.ToString());
             _dtrEntry.Tooltip = sb.ToString().Trim();
 
+            //
             _lastUpdateTime = DateTime.Now;
+
+            //通知
+            if(blockNum > _lastBlockNum)
+            {
+                //发送聊天通知
+                Chat.Instance.SendMessage("/e " + Configuration.EchoTips);
+            }
+            _lastBlockNum = blockNum;
         }
         #endregion
 
         #region Common
+        private void OnClick_Dtr()
+        {
+            _mainWindow.Toggle();
+        }
+
         //绘制UI方法
         private void DrawUI()
         {
@@ -391,8 +406,12 @@ namespace Main
             Svc.PluginInterface.UiBuilder.OpenMainUi -= ToggleMainUI;
             Svc.ContextMenu.OnMenuOpened -= OnOpenContextMenu;
             //移除信息栏
-            _dtrEntry?.Remove();
-            _dtrEntry = null;
+            if(_dtrEntry is { })
+            {
+                _dtrEntry.OnClick -= OnClick_Dtr;
+                _dtrEntry.Remove();
+                _dtrEntry = null;
+            }
             //移除黑名单Hook
             InfoProxyBlackListUpdateHook?.Disable();
             InfoProxyBlackListUpdateHook = null;

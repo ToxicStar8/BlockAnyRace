@@ -36,6 +36,9 @@ namespace Main
         //语言类型 zh=0 todo:待实现
         public int LangIndex { get; set; } = 0;
 
+        //默语提醒
+        public string EchoTips { get; set; } = Lang.EchoTips;
+
         public void Init()
         {
             BlockTargetRoleDic ??= new();
