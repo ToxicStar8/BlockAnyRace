@@ -124,7 +124,13 @@ namespace Main
                 ImGui.TableSetColumnIndex(1);
                 if (ImGui.Button(Lang.SavePresets))
                 {
-                    config.TempByteToRace = config.ByteToRace;
+                    config.TempByteToRace ??= new();
+                    foreach (var item in config.ByteToRace)
+                    {
+                        var key = item.Key;
+                        var curInfo = config.ByteToRace[key];
+                        config.TempByteToRace[key] = new(curInfo.IsHideMale, curInfo.IsHideFemale);
+                    }
                     config.Save();
                 }
                 //读取预设
@@ -134,7 +140,13 @@ namespace Main
                     if (config.TempByteToRace is null || config.TempByteToRace.Count is 0)
                         return;
 
-                    config.ByteToRace = config.TempByteToRace;
+                    config.ByteToRace ??= new();
+                    foreach (var item in config.TempByteToRace)
+                    {
+                        var key = item.Key;
+                        var tempInfo = config.TempByteToRace[key];
+                        config.ByteToRace[key] = new(tempInfo.IsHideMale, tempInfo.IsHideFemale);
+                    }
                     config.Save();
                 }
                 ImGui.EndTable();

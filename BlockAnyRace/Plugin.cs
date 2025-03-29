@@ -260,7 +260,7 @@ namespace Main
             _lastUpdateTime = DateTime.Now;
 
             //通知
-            if(blockNum > _lastBlockNum)
+            if(Configuration.IsShowTipsInChat && blockNum > _lastBlockNum)
             {
                 //发送聊天通知
                 Chat.Instance.SendMessage("/e " + Configuration.EchoTips);
