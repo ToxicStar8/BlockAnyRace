@@ -45,7 +45,7 @@ namespace Main
         private IDtrBarEntry _dtrEntry;
         //黑名单更新
         private HashSet<ulong> _blackHashSet { get; set; }
-        private readonly string InfoProxyBlackListUpdateSig = "48 89 5C 24 ?? 4C 8B 91 ?? ?? ?? ?? 33 C0";
+        private readonly string InfoProxyBlackListUpdateSig = "E8 ?? ?? ?? ?? 83 7C 24 ?? ?? 75 ?? E8";
         private delegate void InfoProxyBlackListUpdateDelegate(InfoProxyBlacklist.BlockResult* outBlockResult, ulong accountId, ulong contentId);
         private Hook<InfoProxyBlackListUpdateDelegate>? InfoProxyBlackListUpdateHook;
 

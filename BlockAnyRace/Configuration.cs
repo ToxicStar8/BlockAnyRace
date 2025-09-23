@@ -4,7 +4,6 @@ using Dalamud.Interface.Colors;
 using Dalamud.Memory;
 using Dalamud.Plugin;
 using ECommons.DalamudServices;
-using ImGuiNET;
 using System;
 using System.Collections.Generic;
 

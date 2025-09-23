@@ -17,11 +17,11 @@ using Dalamud.Game.ClientState.Objects.Enums;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
-using ImGuiNET;
 using ImGuiScene;
 using Dalamud.Interface.Utility.Table;
 using System.Data.Common;
 using System.Diagnostics;
+using Dalamud.Bindings.ImGui;
 
 namespace Main
 {

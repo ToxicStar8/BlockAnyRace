@@ -35,6 +35,7 @@ using System.Formats.Tar;
 using System.Text;
 using Lumina.Excel.Sheets;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
+using Dalamud.Game.Gui.Dtr;
 
 namespace Main
 {
@@ -270,7 +271,7 @@ namespace Main
         #endregion
 
         #region Common
-        private void OnClick_Dtr()
+        private void OnClick_Dtr(DtrInteractionEvent e)
         {
             _mainWindow.Toggle();
         }
