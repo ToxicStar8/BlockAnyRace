@@ -198,7 +198,7 @@ namespace Main
                         continue;
                     }
 
-                    Svc.Log.Debug(chara->NameString + " RenderFlags=" + chara->RenderFlags + " Race=" + race);
+                    //Svc.Log.Debug(chara->NameString + " RenderFlags=" + chara->RenderFlags + " Race=" + race);
 
                     var needDeletePos = obj.Position;
                     //屏蔽特定种族与性别
