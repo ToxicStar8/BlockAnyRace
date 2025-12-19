@@ -1,41 +1,42 @@
-using Dalamud.Game.Command;
-using Dalamud.IoC;
-using Dalamud.Plugin;
-using System.IO;
-using Dalamud.Interface.Windowing;
-using System.Net.NetworkInformation;
-using Dalamud.Game.Network;
-using FFXIVClientStructs.FFXIV.Client.Game.Event;
-using System.Reflection.Emit;
-using System;
-using Dalamud.Logging;
-using Dalamud.Hooking;
 using Dalamud.Game;
-using Dalamud.Plugin.Services;
-using ECommons;
-using ECommons.DalamudServices;
-using System.Reflection;
-using Dalamud.Game.ClientState.Objects.Enums;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using Lumina.Data.Parsing.Layer;
-using FFXIVClientStructs.FFXIV.Client.Game.Group;
-using FFXIVClientStructs.FFXIV.Client.UI.Info;
-using System.Collections.Generic;
-using System.Linq;
-using FFXIVClientStructs.FFXIV.Common.Lua;
-using ECommons.Automation;
-using System.Numerics;
-using System.Diagnostics;
-using Dalamud.Utility.Signatures;
-using Dalamud.Game.Gui.ContextMenu;
-using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Addon.Lifecycle;
-using FFXIVClientStructs.FFXIV.Client.Graphics.Kernel;
-using System.Formats.Tar;
-using System.Text;
-using Lumina.Excel.Sheets;
-using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
+using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.Command;
+using Dalamud.Game.Gui.ContextMenu;
 using Dalamud.Game.Gui.Dtr;
+using Dalamud.Game.Network;
+using Dalamud.Game.Text.SeStringHandling;
+using Dalamud.Hooking;
+using Dalamud.Interface.Windowing;
+using Dalamud.IoC;
+using Dalamud.Logging;
+using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
+using Dalamud.Utility.Signatures;
+using ECommons;
+using ECommons.Automation;
+using ECommons.DalamudServices;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using FFXIVClientStructs.FFXIV.Client.Game.Event;
+using FFXIVClientStructs.FFXIV.Client.Game.Group;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Kernel;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
+using FFXIVClientStructs.FFXIV.Client.UI.Info;
+using FFXIVClientStructs.FFXIV.Common.Lua;
+using Lumina.Data.Parsing.Layer;
+using Lumina.Excel.Sheets;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Formats.Tar;
+using System.IO;
+using System.Linq;
+using System.Net.NetworkInformation;
+using System.Numerics;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Text;
 
 namespace Main
 {
@@ -145,7 +146,7 @@ namespace Main
             if ((DateTime.Now - _lastUpdateTime).TotalMilliseconds < Configuration.CheckMillisecond) return;
             if (!TerritoryTypeWhitelist.Contains(Svc.ClientState.TerritoryType)) return;
             if (_dtrEntry is null) return;
-            if (Svc.ClientState.LocalPlayer is not { } localPlayer) return;
+            if (Svc.Objects.LocalPlayer is not { } localPlayer) return;
 
             var blockNum = 0;
             var sb = new StringBuilder();
@@ -153,11 +154,11 @@ namespace Main
             var myPos = localPlayer.Position;
             var checkRange = Configuration.CheckRange * Configuration.CheckRange;
 
-            var invisible = (int)VisibilityFlags.Model;
+            var invisible = VisibilityFlags.Model;
 
             foreach (var obj in Svc.Objects)
             {
-                if (obj is not null && obj.ObjectKind is ObjectKind.Player)
+                if (obj is { ObjectKind: Dalamud.Game.ClientState.Objects.Enums.ObjectKind.Player })
                 {
                     var chara = (Character*)obj.Address;
                     //转不出来
@@ -167,15 +168,16 @@ namespace Main
                     }
 
                     //是自己
-                    if (chara->ContentId == Svc.ClientState.LocalContentId)
+                    if (chara->ContentId == Svc.PlayerState.ContentId)
                     {
                         continue;
                     }
 
-                    //转不出服务器
+                    //转不出服务器也拦截，因为跨大区
                     if (!Worlds.TryGetValue(chara->HomeWorld,out var world))
                     {
-                        continue;
+                        //Svc.Log.Debug(chara->NameString + " 跨区HomeWorld=" + chara->HomeWorld);
+                        //continue;
                     }
 
                     //好友
@@ -191,12 +193,12 @@ namespace Main
                     }
 
                     var race = chara->DrawData.CustomizeData.Race;
-                    if(!Configuration.ByteToRace.TryGetValue(race ,out var raceInfo))
+                    if (!Configuration.ByteToRace.TryGetValue(race ,out var raceInfo))
                     {
                         continue;
                     }
 
-                    //Svc.Log.Debug(chara->NameString + " RenderFlags=" + chara->RenderFlags);
+                    Svc.Log.Debug(chara->NameString + " RenderFlags=" + chara->RenderFlags + " Race=" + race);
 
                     var needDeletePos = obj.Position;
                     //屏蔽特定种族与性别
@@ -248,7 +250,7 @@ namespace Main
                         //非屏蔽玩家且被屏蔽（隐身？），改为默认值
                         if ((chara->RenderFlags & invisible) is not 0)
                         {
-                            chara->RenderFlags = 0;
+                            chara->RenderFlags = VisibilityFlags.None;
                         }
                     }
                 }
@@ -264,7 +266,7 @@ namespace Main
             if(Configuration.IsShowTipsInChat && blockNum > _lastBlockNum)
             {
                 //发送聊天通知
-                Chat.Instance.SendMessage("/e " + Configuration.EchoTips);
+                Chat.SendMessage("/e " + Configuration.EchoTips);
             }
             _lastBlockNum = blockNum;
         }
