@@ -8,6 +8,7 @@ using Dalamud.IoC;
 using Dalamud.Logging;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
+using Dalamud.Utility;
 using ECommons;
 using ECommons.Automation.LegacyTaskManager;
 using ECommons.DalamudServices;
@@ -62,10 +63,12 @@ namespace Main
                 {
                     _worlds = new();
 
-                    var dc = Svc.ClientState.LocalPlayer.CurrentWorld.Value.DataCenter.RowId;
-                    var list = Svc.Data.GetExcelSheet<World>().Where(x => x.DataCenter.RowId == dc).ToList();
+                    var list = Svc.Data.GetExcelSheet<World>();
                     foreach (var item in list)
                     {
+                        var name = item.Name.ToString();
+                        if (name.IsNullOrWhitespace())
+                            continue;
                         Svc.Log.Debug("已添加区服=" + item.Name.ToString());
                         _worlds[item.RowId] = item;
                     }
