@@ -1,7 +1,4 @@
 using Dalamud.Configuration;
-using Dalamud.Game.ClientState.Conditions;
-using Dalamud.Interface.Colors;
-using Dalamud.Memory;
 using Dalamud.Plugin;
 using ECommons.DalamudServices;
 using System;
@@ -47,6 +44,7 @@ namespace Main
         public void Init()
         {
             BlockTargetRoleDic ??= new();
+            TempByteToRace ??= new();
             ByteToRace ??= new() {
             { 0, new RaceInfo(false,false) },
             { 1, new RaceInfo(false,false) },

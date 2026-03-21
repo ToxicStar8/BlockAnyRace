@@ -1,41 +1,21 @@
-using Dalamud.Game;
-using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.Command;
 using Dalamud.Game.Gui.ContextMenu;
 using Dalamud.Game.Gui.Dtr;
-using Dalamud.Game.Network;
-using Dalamud.Game.Text.SeStringHandling;
-using Dalamud.Hooking;
-using Dalamud.Interface.Windowing;
-using Dalamud.IoC;
-using Dalamud.Logging;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
-using Dalamud.Utility.Signatures;
 using ECommons;
 using ECommons.Automation;
 using ECommons.DalamudServices;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using FFXIVClientStructs.FFXIV.Client.Game.Event;
-using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using FFXIVClientStructs.FFXIV.Client.Graphics.Kernel;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.UI.Info;
-using FFXIVClientStructs.FFXIV.Common.Lua;
-using Lumina.Data.Parsing.Layer;
 using Lumina.Excel.Sheets;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Formats.Tar;
-using System.IO;
 using System.Linq;
-using System.Net.NetworkInformation;
 using System.Numerics;
-using System.Reflection;
-using System.Reflection.Emit;
 using System.Text;
 
 namespace Main
@@ -143,7 +123,8 @@ namespace Main
         #region Core
         private void Update(IFramework framework)
         {
-            if ((DateTime.Now - _lastUpdateTime).TotalMilliseconds < Configuration.CheckMillisecond) return;
+            var now = DateTime.UtcNow;
+            if ((now - _lastUpdateTime).TotalMilliseconds < Configuration.CheckMillisecond) return;
             if (!TerritoryTypeWhitelist.Contains(Svc.ClientState.TerritoryType)) return;
             if (_dtrEntry is null) return;
             if (Svc.Objects.LocalPlayer is not { } localPlayer) return;
@@ -256,11 +237,11 @@ namespace Main
                 }
             }
 
-            _dtrEntry.Text = string.Format(Lang.BlockNum, blockNum.ToString());
+            _dtrEntry.Text = string.Format(Lang.BlockNum, blockNum);
             _dtrEntry.Tooltip = sb.ToString().Trim();
 
             //
-            _lastUpdateTime = DateTime.Now;
+            _lastUpdateTime = now;
 
             //通知
             if(Configuration.IsShowTipsInChat && blockNum > _lastBlockNum)

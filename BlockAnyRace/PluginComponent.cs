@@ -1,28 +1,14 @@
-using Dalamud.Game;
-using Dalamud.Game.ClientState.Keys;
-using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.Gui.Dtr;
 using Dalamud.Hooking;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
-using Dalamud.Logging;
 using Dalamud.Plugin;
-using Dalamud.Plugin.Services;
 using Dalamud.Utility;
-using ECommons;
-using ECommons.Automation.LegacyTaskManager;
 using ECommons.DalamudServices;
-using ECommons.ExcelServices.TerritoryEnumeration;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
-using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Info;
 using Lumina.Excel.Sheets;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
 using World = Lumina.Excel.Sheets.World;
 
 namespace Main
@@ -77,7 +63,6 @@ namespace Main
             }
         }
 
-        [NonSerialized]
         private readonly HashSet<ushort> TerritoryTypeWhitelist = [];
 
         //Update限制

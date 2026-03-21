@@ -1,27 +1,9 @@
-using System;
-using System.IO;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Xml.Linq;
-using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Interface.Internal;
 using Dalamud.Interface.Windowing;
-using Dalamud.Plugin.Services;
-using ECommons.DalamudServices;
-using ECommons.GameFunctions;
-using ECommons.ImGuiMethods;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using Dalamud.Game.ClientState.Objects.Enums;
-using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
-using FFXIVClientStructs.FFXIV.Client.UI.Misc;
-using ImGuiScene;
-using Dalamud.Interface.Utility.Table;
-using System.Data.Common;
-using System.Diagnostics;
 using Dalamud.Bindings.ImGui;
+using ECommons.DalamudServices;
+using System;
+using System.Diagnostics;
+using System.Numerics;
 
 namespace Main
 {
@@ -69,7 +51,6 @@ namespace Main
                     ImGui.PushID(item.Key + 100);
                     bool isHideMale = item.Value.IsHideMale;
                     ImGui.Checkbox("", ref isHideMale);
-                    item.Value.IsHideMale = isHideMale;
                     if (item.Value.IsHideMale != isHideMale)
                     {
                         item.Value.IsHideMale = isHideMale;
@@ -199,96 +180,96 @@ namespace Main
             if (ImGui.BeginTabItem(Lang.Setting))
             {
                 //检查范围
-                var checkRange = Plugin.Instance.Configuration.CheckRange;
+                var checkRange = config.CheckRange;
                 if (ImGui.InputInt(Lang.CheckBlockRange, ref checkRange))
                 {
-                    Plugin.Instance.Configuration.CheckRange = Math.Max(1, checkRange);
+                    config.CheckRange = Math.Max(1, checkRange);
                     if (ImGui.IsItemDeactivatedAfterEdit())
                     {
-                        Plugin.Instance.Configuration.Save();
+                        config.Save();
                     }
                 }
 
                 //检查间隔
-                var checkMillisecond = Plugin.Instance.Configuration.CheckMillisecond;
+                var checkMillisecond = config.CheckMillisecond;
                 if (ImGui.InputInt(Lang.CheckIntervalMillisecond, ref checkMillisecond))
                 {
-                    Plugin.Instance.Configuration.CheckMillisecond = Math.Max(1, checkMillisecond);
+                    config.CheckMillisecond = Math.Max(1, checkMillisecond);
                     if (ImGui.IsItemDeactivatedAfterEdit())
                     {
-                        Plugin.Instance.Configuration.Save();
+                        config.Save();
                     }
                 }
 
                 //默语提示
-                bool isShowTipsInChat = Plugin.Instance.Configuration.IsShowTipsInChat;
+                bool isShowTipsInChat = config.IsShowTipsInChat;
                 ImGui.Checkbox(Lang.IsShowEchoTips, ref isShowTipsInChat);
-                if (Plugin.Instance.Configuration.IsShowTipsInChat != isShowTipsInChat)
+                if (config.IsShowTipsInChat != isShowTipsInChat)
                 {
-                    Plugin.Instance.Configuration.IsShowTipsInChat = isShowTipsInChat;
-                    Plugin.Instance.Configuration.Save();
+                    config.IsShowTipsInChat = isShowTipsInChat;
+                    config.Save();
                 }
-                if (Plugin.Instance.Configuration.IsShowTipsInChat)
+                if (config.IsShowTipsInChat)
                 {
-                    var echoTips = Plugin.Instance.Configuration.EchoTips;
+                    var echoTips = config.EchoTips;
                     if (ImGui.InputText(Lang.EchoTipsTitle, ref echoTips, 20))
                     {
-                        Plugin.Instance.Configuration.EchoTips = echoTips;
+                        config.EchoTips = echoTips;
                         if (ImGui.IsItemDeactivatedAfterEdit())
                         {
-                            Plugin.Instance.Configuration.Save();
+                            config.Save();
                         }
                     }
                 }
 
                 //是否屏蔽好友
-                bool isBlockFriend = Plugin.Instance.Configuration.IsBlockFriend;
+                bool isBlockFriend = config.IsBlockFriend;
                 ImGui.Checkbox(Lang.IsBlockFriend, ref isBlockFriend);
-                if (Plugin.Instance.Configuration.IsBlockFriend != isBlockFriend)
+                if (config.IsBlockFriend != isBlockFriend)
                 {
-                    Plugin.Instance.Configuration.IsBlockFriend = isBlockFriend;
-                    Plugin.Instance.Configuration.Save();
+                    config.IsBlockFriend = isBlockFriend;
+                    config.Save();
                 }
 
                 //是否屏蔽队友
-                bool isBlockParty = Plugin.Instance.Configuration.IsBlockParty;
+                bool isBlockParty = config.IsBlockParty;
                 ImGui.Checkbox(Lang.IsBlockParty, ref isBlockParty);
-                if (Plugin.Instance.Configuration.IsBlockParty != isBlockParty)
+                if (config.IsBlockParty != isBlockParty)
                 {
-                    Plugin.Instance.Configuration.IsBlockParty = isBlockParty;
-                    Plugin.Instance.Configuration.Save();
+                    config.IsBlockParty = isBlockParty;
+                    config.Save();
                 }
 
                 //是否登录就显示本窗口
-                bool isLoginedOpenWindow = Plugin.Instance.Configuration.IsLoginedOpenWindow;
+                bool isLoginedOpenWindow = config.IsLoginedOpenWindow;
                 ImGui.Checkbox(Lang.LoginShow, ref isLoginedOpenWindow);
-                if (Plugin.Instance.Configuration.IsLoginedOpenWindow != isLoginedOpenWindow)
+                if (config.IsLoginedOpenWindow != isLoginedOpenWindow)
                 {
-                    Plugin.Instance.Configuration.IsLoginedOpenWindow = isLoginedOpenWindow;
-                    Plugin.Instance.Configuration.Save();
+                    config.IsLoginedOpenWindow = isLoginedOpenWindow;
+                    config.Save();
                 }
 
                 //禁用esc关闭，仅可使用x关闭
-                bool isEscCloseWindow = Plugin.Instance.Configuration.IsEscCloseWindow;
+                bool isEscCloseWindow = config.IsEscCloseWindow;
                 ImGui.Checkbox(Lang.EscClose, ref isEscCloseWindow);
-                if (Plugin.Instance.Configuration.IsEscCloseWindow != isEscCloseWindow)
+                if (config.IsEscCloseWindow != isEscCloseWindow)
                 {
-                    Plugin.Instance.Configuration.IsEscCloseWindow = isEscCloseWindow;
+                    config.IsEscCloseWindow = isEscCloseWindow;
                     RespectCloseHotkey = isEscCloseWindow;
-                    Plugin.Instance.Configuration.Save();
+                    config.Save();
                 }
 
                 //是否快捷右键添加屏蔽玩家
-                bool isRightClickAddShortcut = Plugin.Instance.Configuration.IsRightClickAddShortcut;
+                bool isRightClickAddShortcut = config.IsRightClickAddShortcut;
                 ImGui.Checkbox(Lang.RightAddBlock, ref isRightClickAddShortcut);
-                if (Plugin.Instance.Configuration.IsRightClickAddShortcut != isRightClickAddShortcut)
+                if (config.IsRightClickAddShortcut != isRightClickAddShortcut)
                 {
-                    Plugin.Instance.Configuration.IsRightClickAddShortcut = isRightClickAddShortcut;
-                    Plugin.Instance.Configuration.Save();
+                    config.IsRightClickAddShortcut = isRightClickAddShortcut;
+                    config.Save();
                 }
 
                 ImGui.EndTabItem();
-            } 
+            }
 
             //关于
             if (ImGui.BeginTabItem(Lang.About))
