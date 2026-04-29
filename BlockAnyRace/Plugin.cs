@@ -355,7 +355,10 @@ namespace Main
                 return;
             }
             var cid = menuTargetDefault.TargetContentId;
-            Configuration.BlockTargetRoleDic.Remove(cid);
+            if (Configuration.BlockTargetRoleDic.Remove(cid))
+            {
+                Configuration.Save();
+            }
         }
 
         private void AddRoleToBlockDic(IMenuItemClickedArgs args)
@@ -371,6 +374,7 @@ namespace Main
                 return;
             }
             Configuration.BlockTargetRoleDic[cid] = new PlayerInfo(cid, menuTargetDefault.TargetName, menuTargetDefault.TargetHomeWorld.Value.Name.ToString());
+            Configuration.Save();
         }
         #endregion
 

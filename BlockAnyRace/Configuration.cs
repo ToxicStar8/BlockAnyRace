@@ -36,7 +36,7 @@ namespace Main
         //保存的预设
         public Dictionary<byte, RaceInfo> TempByteToRace { get; set; }
         //屏蔽的指定玩家 Key=CID Value=PlayerInfo
-        public Dictionary<ulong, PlayerInfo> BlockTargetRoleDic { get; private set; }
+        public Dictionary<ulong, PlayerInfo> BlockTargetRoleDic { get; set; }
 
         //语言类型 zh=0 todo:待实现
         public int LangIndex { get; set; } = 0;
