@@ -63,7 +63,7 @@ namespace Main
             }
         }
 
-        private readonly HashSet<ushort> TerritoryTypeWhitelist = [];
+        private readonly HashSet<uint> TerritoryTypeWhitelist = [];
 
         //Update限制
         private DateTime _lastUpdateTime;
