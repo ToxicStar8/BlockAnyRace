@@ -129,11 +129,30 @@ namespace Main
             if (_dtrEntry is null) return;
             if (Svc.Objects.LocalPlayer is not { } localPlayer) return;
 
+            var byteToRace = Configuration.ByteToRace;
+            var targetRoles = Configuration.BlockTargetRoleDic;
+            var hasRaceBlocks = byteToRace.Values.Any(x => x.IsHideMale || x.IsHideFemale);
+            var hasTargetBlocks = targetRoles.Count is not 0;
+            var hasBlackBlocks = _blackHashSet.Count is not 0;
+
+            if (!hasRaceBlocks && !hasTargetBlocks && !hasBlackBlocks && !_hasHiddenPlayers)
+            {
+                _dtrEntry.Text = string.Format(Lang.BlockNum, 0);
+                _dtrEntry.Tooltip = string.Empty;
+                _lastBlockNum = 0;
+                _lastUpdateTime = now;
+                return;
+            }
+
             var blockNum = 0;
-            var sb = new StringBuilder();
+            StringBuilder? sb = null;
 
             var myPos = localPlayer.Position;
             var checkRange = Configuration.CheckRange * Configuration.CheckRange;
+            var myContentId = Svc.PlayerState.ContentId;
+            var isBlockFriend = Configuration.IsBlockFriend;
+            var isBlockParty = Configuration.IsBlockParty;
+            var hasHiddenPlayers = false;
 
             var invisible = VisibilityFlags.Model;
 
@@ -149,39 +168,31 @@ namespace Main
                     }
 
                     //是自己
-                    if (chara->ContentId == Svc.PlayerState.ContentId)
+                    if (chara->ContentId == myContentId)
                     {
                         continue;
                     }
 
-                    //转不出服务器也拦截，因为跨大区
-                    if (!Worlds.TryGetValue(chara->HomeWorld,out var world))
-                    {
-                        //Svc.Log.Debug(chara->NameString + " 跨区HomeWorld=" + chara->HomeWorld);
-                        //continue;
-                    }
-
                     //好友
-                    if (!Configuration.IsBlockFriend && chara->IsFriend)
+                    if (!isBlockFriend && chara->IsFriend)
                     {
                         continue;
                     }
 
                     //小队里
-                    if (!Configuration.IsBlockParty && chara->IsPartyMember)
+                    if (!isBlockParty && chara->IsPartyMember)
                     {
                         continue;
                     }
 
                     var race = chara->DrawData.CustomizeData.Race;
-                    if (!Configuration.ByteToRace.TryGetValue(race ,out var raceInfo))
+                    if (!byteToRace.TryGetValue(race ,out var raceInfo))
                     {
                         continue;
                     }
 
                     //Svc.Log.Debug(chara->NameString + " RenderFlags=" + chara->RenderFlags + " Race=" + race);
 
-                    var needDeletePos = obj.Position;
                     //屏蔽特定种族与性别
                     if ((raceInfo.IsHideMale && chara->Sex is 0) || (raceInfo.IsHideFemale && chara->Sex is 1))
                     {
@@ -190,15 +201,18 @@ namespace Main
                         {
                             chara->RenderFlags |= invisible;
                         }
+                        hasHiddenPlayers = true;
                         //不进行根号计算，消耗大
-                        if (Vector3.DistanceSquared(myPos, needDeletePos) <= checkRange)
+                        if (Vector3.DistanceSquared(myPos, obj.Position) <= checkRange)
                         {
                             var sex = chara->Sex;
                             if(sex is 0 or 1)
                             {
+                                //转不出服务器也拦截，因为跨大区
+                                Worlds.TryGetValue(chara->HomeWorld,out var world);
                                 var sexStr = Lang.Sex[sex];
                                 var str = $"{obj.Name} @{world.Name} @{Lang.RaceName[race]} {sexStr}";
-                                sb.AppendLine(str);
+                                (sb ??= new StringBuilder()).AppendLine(str);
                                 blockNum++;
                             }
                         }
@@ -207,7 +221,7 @@ namespace Main
                     else
                     {
                         bool isBlack = _blackHashSet.Contains(chara->ContentId) || _blackHashSet.Contains(chara->AccountId);
-                        bool isTarget = Configuration.BlockTargetRoleDic.ContainsKey(chara->ContentId);
+                        bool isTarget = targetRoles.ContainsKey(chara->ContentId);
                         if (isBlack || isTarget)
                         {
                             //如果是指定玩家，屏蔽
@@ -217,12 +231,15 @@ namespace Main
                                 {
                                     chara->RenderFlags |= invisible;
                                 }
+                                hasHiddenPlayers = true;
                             }
                             //不进行根号计算，消耗大
-                            if (Vector3.DistanceSquared(myPos, needDeletePos) <= checkRange)
+                            if (Vector3.DistanceSquared(myPos, obj.Position) <= checkRange)
                             {
+                                //转不出服务器也拦截，因为跨大区
+                                Worlds.TryGetValue(chara->HomeWorld,out var world);
                                 var str = isTarget ? Lang.TargetRole : Lang.BlackList;
-                                sb.AppendLine($"{obj.Name} @{world.Name} @{str}");
+                                (sb ??= new StringBuilder()).AppendLine($"{obj.Name} @{world.Name} @{str}");
                                 blockNum++;
                             }
                             continue;
@@ -238,7 +255,8 @@ namespace Main
             }
 
             _dtrEntry.Text = string.Format(Lang.BlockNum, blockNum);
-            _dtrEntry.Tooltip = sb.ToString().Trim();
+            _dtrEntry.Tooltip = sb?.ToString().Trim() ?? string.Empty;
+            _hasHiddenPlayers = hasHiddenPlayers;
 
             //
             _lastUpdateTime = now;

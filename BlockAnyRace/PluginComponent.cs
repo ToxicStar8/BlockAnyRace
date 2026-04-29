@@ -70,5 +70,7 @@ namespace Main
 
         //最后检测到的屏蔽玩家人数
         private int _lastBlockNum;
+        //是否曾经隐藏过玩家，用于无规则时跳过扫描
+        private bool _hasHiddenPlayers;
     }
 }
