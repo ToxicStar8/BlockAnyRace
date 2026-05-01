@@ -158,7 +158,7 @@ namespace Main
 
             foreach (var obj in Svc.Objects)
             {
-                if (obj is { ObjectKind: Dalamud.Game.ClientState.Objects.Enums.ObjectKind.Player })
+                if (obj is { ObjectKind: Dalamud.Game.ClientState.Objects.Enums.ObjectKind.Pc })
                 {
                     var chara = (Character*)obj.Address;
                     //转不出来
