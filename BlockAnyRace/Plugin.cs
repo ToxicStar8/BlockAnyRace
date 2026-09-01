@@ -45,7 +45,9 @@ namespace Main
             _dtrEntry.OnClick += OnClick_Dtr;
             //黑名单
             _blackHashSet ??= new HashSet<ulong>();
-            InfoProxyBlackListUpdateHook ??= Svc.Hook.HookFromSignature<InfoProxyBlackListUpdateDelegate>(InfoProxyBlackListUpdateSig, InfoProxyBlackListUpdateDetour);
+            InfoProxyBlackListUpdateHook ??= Svc.Hook.HookFromAddress<InfoProxyBlacklist.Delegates.GetBlockResult>(
+                InfoProxyBlacklist.Addresses.GetBlockResult.Value,
+                InfoProxyBlackListUpdateDetour);
             InfoProxyBlackListUpdateHook.Enable();
 
             //绑定指令监听
@@ -91,9 +93,13 @@ namespace Main
         }
 
         #region Black Hook
-        private void InfoProxyBlackListUpdateDetour(InfoProxyBlacklist.BlockResult* outBlockResult, ulong accountId, ulong contentId)
+        private void InfoProxyBlackListUpdateDetour(
+            InfoProxyBlacklist* thisPtr,
+            InfoProxyBlacklist.BlockResult* outBlockResult,
+            ulong accountId,
+            ulong contentId)
         {
-            InfoProxyBlackListUpdateHook.Original(outBlockResult, accountId, contentId);
+            InfoProxyBlackListUpdateHook!.Original(thisPtr, outBlockResult, accountId, contentId);
 
             //触发了黑名单更新
             if (outBlockResult->BlockedCharacterIndex != _blackHashSet.Count)

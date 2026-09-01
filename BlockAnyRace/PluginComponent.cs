@@ -32,9 +32,7 @@ namespace Main
         private IDtrBarEntry _dtrEntry;
         //黑名单更新
         private HashSet<ulong> _blackHashSet { get; set; }
-        private readonly string InfoProxyBlackListUpdateSig = "E8 ?? ?? ?? ?? 83 7C 24 ?? ?? 75 ?? E8";
-        private delegate void InfoProxyBlackListUpdateDelegate(InfoProxyBlacklist.BlockResult* outBlockResult, ulong accountId, ulong contentId);
-        private Hook<InfoProxyBlackListUpdateDelegate>? InfoProxyBlackListUpdateHook;
+        private Hook<InfoProxyBlacklist.Delegates.GetBlockResult>? InfoProxyBlackListUpdateHook;
 
         //服务器列表
         private Dictionary<uint, World> _worlds;
