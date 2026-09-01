@@ -67,7 +67,12 @@ namespace Main
             var tbTerritoryType = Svc.Data.GameData.Excel.GetSheet<TerritoryType>();
             var valueTuples = tbTerritoryType?.Where(
                     //TerritoryIntendedUse=区域预期用途
-                    x => x.TerritoryIntendedUse.Value.RowId is 0 or 1 or 13 or 19 or 21 or 23 or 44 or 46 or 47 &&
+                    //0=城镇，1=野外，13=住宅区室外
+                    //19=旧陆行鸟广场，21=苍穹街，23=金碟游乐场
+                    //44=金碟游乐场跳跳乐，46=海钓，47=云冠群岛
+                    //幻境村有1269（用途15）和1278（用途7）两个区域，仅按区域编号放行，避免包含其它事件区域
+                    x => (x.TerritoryIntendedUse.Value.RowId is 0 or 1 or 13 or 19 or 21 or 23 or 44 or 46 or 47 ||
+                          x.RowId is 1269 or 1278) &&
                           !string.IsNullOrEmpty(x.Name.ToString()) && 
                           x.RowId is not 136).Select(
                 x => ((ushort)x.RowId, x.PlaceName.Value.Name.ToString() ?? "Unknown Place"));
